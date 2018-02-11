@@ -35,6 +35,7 @@ wheels/
 # Data / docs / models
 data/
 output/
+from_others/
 notebook.ipynb
 
 # Config
