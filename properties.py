@@ -19,7 +19,7 @@ DATA_DIR = './data'
 def get_element_properties(data_dir):
     """
     Function to get the element properties from their .csv files (electron
-    affinity, ionization potential, max radius of s, p and d orbitals)
+    affinity, ionization potential, max radius of s, p and d orbitals).
 
     Inputs:
         data_dir - location of data directory containing element_properties

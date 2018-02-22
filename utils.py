@@ -26,7 +26,7 @@ LMN_GRID = np.array(np.meshgrid(pm, pm, pm)).T.reshape(-1, 3)
 
 def get_size(ser, idx):
     """
-    Gets indexed value from pd.Series but returns 0 if index not found
+    Gets indexed value from pd.Series but returns 0 if index not found.
     """
     try:
         s = ser[idx]
@@ -37,7 +37,7 @@ def get_size(ser, idx):
 
 def rmsle(h, y):
     """
-    Compute the Root Mean Squared Log Error for hypthesis h and targets y
+    Compute the Root Mean Squared Log Error for hypothesis h and targets y.
 
     Inputs:
         h - numpy array containing predictions
@@ -49,7 +49,7 @@ def rmsle(h, y):
 def get_xyz_data(filename):
     """
     Gets the XYZ Cartesian coordinates from file and extracts relevant
-    information
+    information.
 
     Inputs:
         filename - name of .xyz file to open
@@ -93,7 +93,8 @@ def get_xyz_data(filename):
 
 def convert_to_red(R, lat, tol=1e-9):
     """
-    Converts atomic coordinates to reduced coordinate system
+    Converts atomic coordinates to reduced coordinate system.
+    Rounds values less than tol to zero.
     """
     B = inv(lat.T)
     R_red = np.matmul(B, R.T).T
@@ -103,7 +104,7 @@ def convert_to_red(R, lat, tol=1e-9):
 
 def get_shortest_distances(R_red, lat):
     """
-    Gets the shortest distances between atom pairs in a periodic crystal
+    Gets the shortest distances between atom pairs in a periodic crystal.
 
     Inputs:
         R_red - matrix of reduced coordinates
@@ -117,14 +118,20 @@ def get_shortest_distances(R_red, lat):
     dists = np.zeros((natom, natom))
     Rij_min = np.zeros((natom, natom, 3))
 
+    # Loop through all atom pairs
     for i in xrange(natom):
         for j in xrange(i):
+            # Separation within unit cell
             rij = R_red[i] - R_red[j]
 
+            # All possible separations allowing for crystal periodicity
             r = rij + LMN_GRID
+
+            # Convert back to real space
             R = np.matmul(A, r.T).T
             d = norm(R, axis=1)
 
+            # Find the index of vector that has the minimum separation
             min_idx = np.argmin(d)
 
             dists[i, j] = d[min_idx]
@@ -162,7 +169,7 @@ def get_factor(spacegroup, gamma):
 
 def get_crytal_graph(R_red, atomlist, dists, factor=1.5):
     """
-    Gets the crystal graph (CG) from the reduced atomic coordinates
+    Gets the crystal graph (CG) from the reduced atomic coordinates.
 
     Inputs:
         R_red    - atomic positions in reduced coordinates
@@ -175,12 +182,14 @@ def get_crytal_graph(R_red, atomlist, dists, factor=1.5):
     natom = len(atomlist)
     G = nx.MultiGraph()
 
+    # Loop through all atom pairs
     for i in xrange(natom):
         sym_i = atomlist[i]
 
         for j in xrange(i):
             sym_j = atomlist[j]
 
+            # Look for M-O bonds only
             if (sym_i != sym_j) and ((sym_i == 'O') or (sym_j == 'O')):
                 node_i = '{}_{}'.format(sym_i, i)
                 node_j = '{}_{}'.format(sym_j, j)
@@ -197,6 +206,7 @@ def get_crytal_graph(R_red, atomlist, dists, factor=1.5):
                                electroneg=ELEMENTS[sym_j].X,
                                atomic_mass=ELEMENTS[sym_j].atomic_mass)
 
+                # Calculate max atomic separation that could be called a bond
                 R_max = (ELEMENTS[sym_i].average_ionic_radius +
                          ELEMENTS[sym_j].average_ionic_radius) * factor
 
@@ -208,7 +218,7 @@ def get_crytal_graph(R_red, atomlist, dists, factor=1.5):
                                symbol='{}-O'.format(sym_metal),
                                bond_length=dists[i, j])
 
-    # Add M-O coordination numbers
+    # Add M-O or O-M coordination numbers to each atom
     for i in xrange(natom):
         sym_i = atomlist[i]
         node_i = '{}_{}'.format(sym_i, i)

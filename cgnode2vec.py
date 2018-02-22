@@ -10,7 +10,7 @@ Node2Vec implementation from:
     Aditya Grover and Jure Leskovec
     Knowledge Discovery and Data Mining (KDD), 2016
 
-Modeified for use with Crystal Graphs by Jeremy Smith 2018
+Modified for use with Crystal Graphs by Jeremy Smith 2018
 """
 
 import numpy as np
@@ -20,9 +20,9 @@ import random
 class GraphNV():
     def __init__(self, nx_G, p, q, is_directed=False, weight_key='weight'):
         self.G = nx_G
-        self.is_directed = is_directed
         self.p = p
         self.q = q
+        self.is_directed = is_directed
         self.weight_key = weight_key
 
     def node2vec_walk(self, walk_length, start_node):
@@ -128,9 +128,10 @@ class GraphNV():
 def alias_setup(probs):
     """
     Compute utility lists for non-uniform sampling from discrete distributions.
-    Refer to https://hips.seas.harvard.edu/blog/2013/03/03/
-        the-alias-method-efficient-sampling-with-many-discrete-outcomes/
-    for details
+    Refer to
+        `https://hips.seas.harvard.edu/blog/2013/03/03/
+        the-alias-method-efficient-sampling-with-many-discrete-outcomes/`
+    for details.
     """
     K = len(probs)
     q = np.zeros(K)
