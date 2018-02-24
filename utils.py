@@ -46,6 +46,18 @@ def rmsle(h, y):
     return np.sqrt(np.square(np.log1p(h) - np.log1p(y)).mean())
 
 
+def rmsle1m(h, y):
+    """
+    Compute the Root Mean Squared Log Error for hypothesis h and targets y.
+    With exp1m transformation on h and y.
+
+    Inputs:
+        h - numpy array containing predictions
+        y - numpy array containing targets
+    """
+    return np.sqrt(np.square(h - y).mean())
+
+
 def get_xyz_data(filename):
     """
     Gets the XYZ Cartesian coordinates from file and extracts relevant
